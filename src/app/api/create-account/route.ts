@@ -3,24 +3,45 @@ import { auth } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const { userId } = auth();
+  try {
+    // User ID from clerk sent via the body of the POST
+    const { userId } = await req.json();
 
-  if (!userId) {
-    return new Response('Not authenticated', {
-      status: 400,
+    // Ensure user is logged in
+    if (!userId) {
+      return new Response(JSON.stringify({ message: 'Not authenticated' }), {
+        status: 400,
+      });
+    }
+
+    // Check if the user already exists
+    const existingUser = await db.user.findUnique({
+      where: {
+        ref: userId,
+      },
+    });
+
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({ message: 'User account already exists' }),
+        {
+          status: 200,
+        }
+      );
+    }
+
+    // Create a new user
+    const newUser = await db.user.create({
+      data: {
+        ref: userId,
+      },
+    });
+
+    return NextResponse.json(newUser);
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return new Response(JSON.stringify({ message: 'An error occurred' }), {
+      status: 500,
     });
   }
-
-  return NextResponse.json({ test: 'test' });
 }
-
-/*
-  const body = req.body;
-  console.log('api:create-account:body', body);
-
-  const user = await db.user.create({
-    data: {
-      ref: id,
-    },
-  });
-*/
