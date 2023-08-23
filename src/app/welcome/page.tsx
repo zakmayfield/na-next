@@ -1,4 +1,4 @@
-import { UserButton, auth } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs';
 
 async function createAccount(userId: string | null) {
   try {
@@ -18,15 +18,9 @@ async function createAccount(userId: string | null) {
 
 export default async function Welcome() {
   const { userId } = auth();
-
   const data = await createAccount(userId);
+
   console.log('welcome:page:data', data);
-  return (
-    <div>
-      Welcome
-      <div>
-        <UserButton />
-      </div>
-    </div>
-  );
+
+  return <div>Welcome</div>;
 }
