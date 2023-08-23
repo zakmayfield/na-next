@@ -8,10 +8,11 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(cuid())
-  ref        String    @unique
-  isApproved Boolean   @default(false)
-  company    Company[]
+  id         String  @id @default(cuid())
+  ref        String  @unique
+  isApproved Boolean @default(false)
+
+  company Company?
 }
 
 model Company {
@@ -19,6 +20,6 @@ model Company {
 
   name String?
 
-  userId String
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 }
